@@ -1,27 +1,11 @@
 import { FaXmark } from "react-icons/fa6";
 import { PropertyDetailType } from "./Interface/Properties";
 import { FaBath, FaBed, FaCheck, FaRulerCombined } from "react-icons/fa";
-
-enum Amenities {
-  Wifi = "Wifi",
-  Full_kitchen = "Full kitchen",
-  Washer_Dryer = "Washer & Dryer",
-  Free_Parking = "Free Parking",
-  Hot_Tub = "Hot Tub",
-  Security_24_7 = "24/7 Security",
-  Wheelchair_Accessible = "Wheelchair Accessible",
-  Elevator_Access = "Elevator Access",
-  Dishwasher = "Dishwasher",
-  Gym_Fitness_Center = "Gym/Fitness Center",
-  Air_Conditioning = "Air Conditioning",
-  Balcony_Patio = "Balcony/Patio",
-  Smart_TV = "Smart TV",
-  Coffee_Maker = "Coffee Maker",
-}
+import PropertyMap from "./PropertyMap";
 
 const PropertyDetails = ({ property }: { property: PropertyDetailType }) => {
   return (
-    <main>
+    <main className="col-span-3">
       <div className="bg-white p-6 rounded-lg shadow-md text-center md:text-left">
         <div className="text-gray-500 mb-4">{property.type}</div>
         <h1 className="text-3xl font-bold mb-4">{property.name}</h1>
@@ -111,7 +95,7 @@ const PropertyDetails = ({ property }: { property: PropertyDetailType }) => {
         </ul>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-        <div id="map"></div>
+        <PropertyMap property={JSON.parse(JSON.stringify(property))} />
       </div>
     </main>
   );

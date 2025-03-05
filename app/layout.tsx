@@ -4,6 +4,8 @@ import { title } from "process";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AuthProvider from "@/components/AuthProvider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata = {
   title: "Property Management",
@@ -25,6 +27,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           <Footer />
         </body>
       </html>
+      <ToastContainer />
     </AuthProvider>
   );
 };

@@ -4,31 +4,52 @@ import Link from "next/link";
 import Logo from "@/assets/images/logo-white.png";
 import ProfilePic from "@/assets/images/profile.png";
 import { FaGoogle } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   useSession,
   getProviders,
   signIn,
   ClientSafeProvider,
+  signOut,
 } from "next-auth/react";
-import { get } from "http";
 
 const Navbar = () => {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState<boolean>(false);
+  const [userUpdated, setUserUpdated] = useState<boolean>(false);
   const [provider, setProvider] = useState<Record<
     string,
     ClientSafeProvider
   > | null>(null);
   const pathName = usePathname();
 
+  const profilePic = useMemo(
+    () => session?.user?.image,
+    [session?.user?.image]
+  );
+
+  const handleSignIn = useCallback((provider: any) => {
+    signIn(provider.id);
+  }, []);
+
+  const handleSignOut = useCallback(() => {
+    signOut();
+    setIsProfileMenuOpen(false);
+  }, []);
+
+  // useEffect(() => {
+  //   if (!userUpdated) {
+  //     update(session);
+  //     setUserUpdated(true);
+  //   }
+  // }, [session]);
+
   useEffect(() => {
     const setAuthProvider = async () => {
       const res = await getProviders();
       setProvider(res);
-      console.log(res);
     };
     setAuthProvider();
   }, []);
@@ -108,11 +129,11 @@ const Navbar = () => {
           {/* Right Side Menu (Logged Out) */}
           {!session && provider && (
             <div className="hidden md:block md:ml-6">
-              {Object.values(provider).map((provider: any) => (
-                <div className="flex items-center">
+              {Object.values(provider).map((provider: any, index) => (
+                <div className="flex items-center" key={index}>
                   <button
                     key={provider.id}
-                    onClick={() => signIn(provider.id)}
+                    onClick={() => handleSignIn(provider)}
                     className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
                   >
                     <FaGoogle className="text-white mr-2" />
@@ -167,8 +188,10 @@ const Navbar = () => {
                     <span className="sr-only">Open user menu</span>
                     <Image
                       className="h-8 w-8 rounded-full"
-                      src={ProfilePic}
-                      alt=""
+                      src={profilePic || ProfilePic}
+                      width={40}
+                      height={40}
+                      alt={session?.user?.name || ""}
                     />
                   </button>
                 </div>
@@ -188,6 +211,7 @@ const Navbar = () => {
                       className="block px-4 py-2 text-sm text-gray-700"
                       role="menuitem"
                       tabIndex={-1}
+                      onClick={() => setIsProfileMenuOpen(false)}
                       id="user-menu-item-0"
                     >
                       Your Profile
@@ -197,12 +221,14 @@ const Navbar = () => {
                       className="block px-4 py-2 text-sm text-gray-700"
                       role="menuitem"
                       tabIndex={-1}
+                      onClick={() => setIsProfileMenuOpen(false)}
                       id="user-menu-item-2"
                     >
                       Saved Properties
                     </Link>
                     <button
-                      className="block px-4 py-2 text-sm text-gray-700"
+                      onClick={handleSignOut}
+                      className="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
                       role="menuitem"
                       tabIndex={-1}
                       id="user-menu-item-2"

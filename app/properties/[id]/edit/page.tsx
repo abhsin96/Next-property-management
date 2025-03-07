@@ -3,9 +3,18 @@ import connectDB from "@/config/database";
 import Property from "@/models/Property";
 import React from "react";
 
-const EditPage = async ({ params }: { params: { id: string } }) => {
+interface Params {
+  id: string;
+}
+
+interface PageProps {
+  params: Params;
+}
+
+const EditPage = async ({ params }: PageProps) => {
   await connectDB();
-  const { id } = await params;
+  const paramsData = await params;
+  const { id } = paramsData;
   const property = (await Property.findById(id).lean()) as unknown as {
     _id: string;
     beds: number;

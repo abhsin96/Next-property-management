@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import "@/assets/styles/globals.css";
-import { title } from "process";
 import Navbar from "@/components/Navbar";
+import { ToastContainer } from "react-toastify";
 import Footer from "@/components/Footer";
 import AuthProvider from "@/components/AuthProvider";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { GlobalProvider } from "@/context/GlobalContext";
 
 export const metadata = {
   title: "Property Management",
@@ -20,14 +20,19 @@ interface MainLayoutProps {
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <AuthProvider>
-      <html>
-        <body>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </body>
-      </html>
-      <ToastContainer />
+      <GlobalProvider>
+        <>
+          <html>
+            <body>
+              <Navbar />
+
+              <main>{children}</main>
+              <Footer />
+            </body>
+          </html>
+          <ToastContainer />
+        </>
+      </GlobalProvider>
     </AuthProvider>
   );
 };

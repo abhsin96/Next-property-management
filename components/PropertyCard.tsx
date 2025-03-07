@@ -1,6 +1,4 @@
 import React, { useMemo } from "react";
-import { PropertyDetailType } from "./Interface/Properties";
-import Image from "next/image";
 import Link from "next/link";
 import { FaBath, FaBed, FaMoneyBill, FaRulerCombined } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";

@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import Link from "next/link";
 import { FaBath, FaBed, FaMoneyBill, FaRulerCombined } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
+import Image from "next/image";
 
 type PropertyCardPropsType = {
   property: any;
@@ -18,12 +19,17 @@ const PropertyCard = ({ property }: PropertyCardPropsType) => {
     }
   }, [property.rates]);
   return (
-    <div className="rounded-xl shadow-md relative">
-      <img
-        src={property.images[0]}
-        alt=""
-        className="w-full h-auto rounded-t-xl"
-      />
+    <div className="rounded-xl shadow-md relative hover:shadow-xl">
+      <Link href={`/properties/${property._id}`}>
+        <Image
+          src={property.images[0]}
+          alt=""
+          width={0}
+          height={0}
+          sizes="auto"
+          className="w-full h-auto rounded-t-xl "
+        />
+      </Link>
       <div className="p-4">
         <div className="text-left md:text-center lg:text-left mb-6">
           <div className="text-gray-600">{property.type}</div>

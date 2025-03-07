@@ -1,8 +1,29 @@
+"use client";
 import addProperty from "@/app/actions/addProperty";
+import { useActionState, useEffect } from "react";
+import SubmitButton from "./SubmitButton";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const PropertyAddhtmlForm = () => {
+  const [state, formAction] = useActionState(addProperty, {
+    error: { message: "" },
+    message: "",
+    id: null,
+  });
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.error?.message) toast.error(state.error.message);
+
+    if (state.message) {
+      toast.success(state.message);
+      router.push(`/properties/${state.id}`);
+    }
+  }, [state]);
+
   return (
-    <form action={addProperty}>
+    <form action={formAction}>
       <h2 className="text-3xl text-center font-semibold mb-6">Add Property</h2>
 
       <div className="mb-4">
@@ -393,12 +414,7 @@ const PropertyAddhtmlForm = () => {
       </div>
 
       <div>
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
-          type="submit"
-        >
-          Add Property
-        </button>
+        <SubmitButton text="Add Property" pendingText="Adding" />
       </div>
     </form>
   );

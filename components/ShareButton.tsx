@@ -4,8 +4,6 @@ import {
   EmailShareButton,
   FacebookIcon,
   FacebookShareButton,
-  InstapaperIcon,
-  InstapaperShareButton,
   TelegramIcon,
   TelegramShareButton,
   TwitterIcon,
@@ -16,7 +14,6 @@ import {
 
 const ShareButton = ({ property }: any) => {
   const shareUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/properties/${property._id}`;
-  console.log(property);
   return (
     <>
       <h3 className="text-xl font-bold text-center pt-2">

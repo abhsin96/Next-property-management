@@ -4,15 +4,20 @@ import cloudinary from "@/config/cloudnary";
 import connectDB from "@/config/database";
 import Property from "@/models/Property";
 import { getSessonUser } from "@/utils/getSessonUser";
+import { error } from "console";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-async function addProperty(formData: any) {
+async function addProperty(previousState: any, formData: any) {
   await connectDB();
 
   const sessionUser = await getSessonUser();
   if (!sessionUser) {
-    throw new Error("User ID is required");
+    return {
+      error: {
+        message: "User ID is required",
+      },
+    };
   }
 
   const { userId } = sessionUser;
@@ -65,12 +70,15 @@ async function addProperty(formData: any) {
     imageUrls.push(result.secure_url);
   }
   propertyData.images = imageUrls;
-  console.log("propertyData", propertyData);
   const newProperty = new Property(propertyData);
-  const res = await newProperty.save();
-  console.log("res", res);
+  await newProperty.save();
   revalidatePath("/", "layout");
-  redirect(`/properties/${newProperty._id}`);
+
+  return {
+    message: `${newProperty.name} Added `,
+    id: newProperty._id,
+    error: { message: "" },
+  };
 }
 
 export default addProperty;

@@ -3,7 +3,6 @@ import ProfileImageDefault from "@/assets/images/profile.png";
 import connectDB from "@/config/database";
 import { getSessonUser } from "@/utils/getSessonUser";
 import Property from "@/models/Property";
-import Link from "next/link";
 import ProfileProperties from "@/components/ProfileProperties";
 
 const ProfilePage = async () => {

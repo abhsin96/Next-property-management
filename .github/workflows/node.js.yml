@@ -1,34 +1,57 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         node-version: [18.x, 20.x, 22.x]
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      # ✅ Inject environment variables
-      - name: Set up environment variables
-        run: |
-          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_DOMAIN=${{ secrets.NEXT_PUBLIC_DOMAIN }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_API_DOMAIN=${{ secrets.NEXT_PUBLIC_API_DOMAIN }}" >> $GITHUB_ENV
-          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> $GITHUB_ENV
-          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> $GITHUB_ENV
-          echo "NEXTAUTH_URL_INTERNAL=${{ secrets.NEXTAUTH_URL_INTERNAL }}" >> $GITHUB_ENV
-          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> $GITHUB_ENV
-          echo "CLOUDNARY_CLOUD_NAME=${{ secrets.CLOUDNARY_CLOUD_NAME }}" >> $GITHUB_ENV
-          echo "CLOUDNARY_SECRET=${{ secrets.CLOUDNARY_SECRET }}" >> $GITHUB_ENV
-          echo "CLOUDNARY_API_KEY=${{ secrets.CLOUDNARY_API_KEY }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_MAPBOX_API_KEY=${{ secrets.NEXT_PUBLIC_MAPBOX_API_KEY }}" >> $GITHUB_ENV
+      - name: Install Dependencies
+        run: npm ci
 
-      - run: npm ci
-      - run: npm run build --if-present
+      - name: Install dotenv (Fix Missing Module)
+        run: npm install dotenv
+
+      - name: Create .env file
+        run: |
+          touch .env
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+          echo "NEXT_PUBLIC_DOMAIN=${{ secrets.NEXT_PUBLIC_DOMAIN }}" >> .env
+          echo "NEXT_PUBLIC_API_DOMAIN=${{ secrets.NEXT_PUBLIC_API_DOMAIN }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
+          echo "NEXTAUTH_URL_INTERNAL=${{ secrets.NEXTAUTH_URL_INTERNAL }}" >> .env
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          echo "CLOUDNARY_CLOUD_NAME=${{ secrets.CLOUDNARY_CLOUD_NAME }}" >> .env
+          echo "CLOUDNARY_SECRET=${{ secrets.CLOUDNARY_SECRET }}" >> .env
+          echo "CLOUDNARY_API_KEY=${{ secrets.CLOUDNARY_API_KEY }}" >> .env
+          echo "NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY }}" >> .env
+          echo "NEXT_PUBLIC_MAPBOX_API_KEY=${{ secrets.NEXT_PUBLIC_MAPBOX_API_KEY }}" >> .env
+        shell: bash
+
+      - name: Debug - Check Environment Variables
+        run: cat .env | grep -v SECRET # Avoid printing secrets in logs
+
+      - name: Build Application
+        run: npm run build
+
+      - name: Restart Application with PM2
+        run: pm2 restart example
